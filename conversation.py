@@ -4,7 +4,7 @@ import os
 
 def main():
     client = OpenAI()
-    system_prompt = "You are a helpful assistant that can answer questions and help with tasks."
+    system_prompt = open("crocodile_prompt").read()
     messages = [{"role": "system", "content": system_prompt}]
 
     print("Chat started. Type /reset to clear, /exit to quit.")
@@ -37,4 +37,3 @@ def main():
         
 if __name__ == "__main__":
     main()
-    
