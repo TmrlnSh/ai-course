@@ -1,94 +1,82 @@
-# AI Conversation CLI
+# Crocodile (Animal Guessing) Game CLI
 
-A minimal command-line chat client that talks to an OpenAI-compatible API using the official Python SDK. It maintains conversation history, supports quick commands (reset/exit), and lets you customize the system prompt and model.
+A terminal game where the LLM acts as a strict Game Master for an animal‑guessing game ("Crocodile"). The model secretly chooses a single animal, gives progressive hints, validates guesses, and manages attempts or a timer. This project includes a streaming CLI and guardrails to keep the word an animal and prevent leaks.
 
 ## Features
-- Maintains full conversation history within the session
-- Quick commands: `/reset` to clear history, `/exit` to quit
-- Configurable system prompt
-- Selectable model (defaults to `gpt-5`)
+- Animal‑only target enforced by the system prompt (never switches mid‑round)
+- Streaming responses for a snappy terminal experience
+- Attempts‑based (default 5) or time‑based rounds
+- Strict hinting: no letters, spellings, rhymes, or translations
+- Basic safety and input validation (ignore blank/repeat guesses)
 
 ## Prerequisites
-- Python 3.9+ (tested with 3.10+ recommended)
-- An OpenAI-compatible API endpoint and API key
-  - Default environment variables used by the SDK:
-    - `OPENAI_API_KEY` (required)
-    - `OPENAI_BASE_URL` (optional; for self-hosted or proxies)
+- Python 3.9+ (3.10+ recommended)
+- OpenAI‑compatible API key
+  - `OPENAI_API_KEY` (required)
+  - `OPENAI_BASE_URL` (optional, for custom endpoints)
 
 ## Installation
-1. Create and activate a virtual environment (recommended):
-   ```bash
-   python3 -m venv .venv
-   source .venv/bin/activate
-   ```
-2. Install dependencies:
-   ```bash
-   pip install --upgrade pip
-   pip install openai
-   ```
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install --upgrade pip
+pip install -r requirements.txt
+```
 
 ## Configuration
-- Set your API key in your shell environment:
-  ```bash
-  export OPENAI_API_KEY="YOUR_API_KEY_HERE"
-  ```
-- If you are using a non-default endpoint (e.g., a proxy or self-hosted server), set:
-  ```bash
-  export OPENAI_BASE_URL="https://your-endpoint.example.com/v1"
-  ```
-- Optional: Edit the default system prompt or model in `conversation.py`:
-  - System prompt: look for `system_prompt = "..."`
-  - Model: look for `model="gpt-5"` in the chat completion call
+Copy the example env and fill in values:
+```bash
+cp .env.example .env
+```
+Environment variables:
+- `OPENAI_API_KEY`: your API key
+- `OPENAI_BASE_URL`: optional custom endpoint
+- `CROC_MODEL`: model name, e.g. `gpt-4o-mini` (default sane fallback)
+- `CROC_MODE`: `attempts` or `timer` (optional)
+- `CROC_ATTEMPTS`: integer attempts, default 5
+- `CROC_TIME_SECONDS`: integer seconds if timer mode, default 120
+- `CROC_LANG`: preferred language code (e.g., `en`, `ru`)
 
 ## Usage
-Run the CLI:
+Run the Crocodile game (streaming):
+```bash
+python main.py
+```
+
+Legacy generic chat (non‑game):
 ```bash
 python conversation.py
 ```
-You will see:
-```
-Chat started. Type /reset to clear, /exit to quit.
-```
-Type your messages at the `You:` prompt.
 
-### Commands
-- `/reset` or `reset`: Clear the current conversation history (retains the system prompt)
-- `/exit`, `/quit`, `/bye` (or without slash): Exit the program
+## System Prompt (Animal‑specific)
+The CLI loads a strict system prompt that:
+- Forces the target to be a single, safe ANIMAL (never generic words)
+- Keeps the chosen animal fixed for the whole round
+- Enforces attempts‑based (default 5) or timer‑based flow
+- Prohibits letters/spellings/rhymes/translations or partial word disclosures
+- Provides concise, one‑hint‑per‑turn feedback: Correct / Close / Incorrect / Invalid
 
-## Example Session
+## Example Play
 ```text
-$ python conversation.py
-Chat started. Type /reset to clear, /exit to quit.
-You: Hello!
-Assistant: Hi there! How can I help you today?
-You: /reset
-Conversation reset.
-You: What is the capital of Japan?
-Assistant: The capital of Japan is Tokyo.
-You: /exit
-Goodbye!
+$ python main.py
+Game Master: Welcome to Crocodile (Animal Edition)! Mode: attempts (5). Language: en.
+Hint: It is a nocturnal mammal known for echolocation.
+Status: Attempts left: 5. What is your guess?
+You: bat
+Game Master: Correct! The animal was: bat. Play again? [y/N]
 ```
-
-## How It Works
-At a high level, the script:
-- Instantiates the SDK client: `client = OpenAI()`
-- Initializes a messages list with a system prompt
-- Appends each user input
-- Calls the Chat Completions API with the running `messages`
-- Prints the assistant reply and appends it back to `messages`
 
 ## Troubleshooting
-- Authentication error: Ensure `OPENAI_API_KEY` is exported and valid
-- Connection error or 404: If using a proxy or self-hosted endpoint, set `OPENAI_BASE_URL`
-- Rate limit or quota errors: Reduce request frequency or check your plan limits
-- Unicode or terminal issues: Try a different terminal or locale settings (`export LC_ALL=en_US.UTF-8`)
+- Missing key: ensure `OPENAI_API_KEY` is set (in env or `.env`).
+- Bad model name: set `CROC_MODEL` to a valid one (e.g., `gpt-4o-mini`).
+- No streaming output: your terminal may buffer; try a different terminal or disable streaming.
+- Proxy/self‑hosted: set `OPENAI_BASE_URL`.
 
-## Notes
-- This is a minimal example intended for learning and quick experiments. For production use, consider adding:
-  - Retries/backoff and structured error handling
-  - Streaming responses for better UX
-  - Config files/flags to control model and system prompt per run
-  - Logging and observability
+## Files
+- `main.py`: Streaming Crocodile game entrypoint
+- `conversation.py`: Minimal generic chat CLI
+- `.env.example`: Example environment variables
+- `requirements.txt`: Pinned dependencies
 
 ## License
-MIT (see your repository’s license if different).
+MIT
