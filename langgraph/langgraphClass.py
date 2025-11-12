@@ -24,6 +24,10 @@ def billing(state: dict):
     return state
 
 
+def response(state: dict):
+    return state
+
+
 from langgraph.graph import StateGraph, START, END
 
 from typing import Literal
@@ -50,8 +54,8 @@ agent_builder.add_node("email_input", email_input)
 agent_builder.add_node("classify_intent", classify_intent)
 agent_builder.add_node("new_client", new_client)
 agent_builder.add_node("tech_support", tech_support)
-
 agent_builder.add_node("billing", billing)
+agent_builder.add_node("response", response)
 
 
 agent_builder.add_edge(START, "email_input")
@@ -66,9 +70,11 @@ agent_builder.add_conditional_edges(
         "billing": "billing"
     }
 )
-agent_builder.add_edge("new_client", END)
-agent_builder.add_edge("tech_support", END)
-agent_builder.add_edge("billing", END)
+agent_builder.add_edge("new_client", "response")
+agent_builder.add_edge("tech_support", "response")
+agent_builder.add_edge("billing", "response")
+
+agent_builder.add_edge("response", END)
 
 agent = agent_builder.compile()
 
