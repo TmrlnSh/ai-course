@@ -1,0 +1,30 @@
+# Виртуальное окружение
+.venv/
+venv/
+
+# Кеши Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Конфигурации IDE
+.idea/
+.vscode/
+*.iml
+
+# Файлы окружения
+.env
+*.env
+
+# Логи
+*.log
+
+# Артефакты тестов
+htmlcov/
+.coverage
+.cache/
+allure-results/
+
+# Системные файлы macOS
+.DS_Store

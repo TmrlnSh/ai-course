@@ -4,6 +4,7 @@ from langchain.chat_models import init_chat_model
 
 model = init_chat_model(
     "gpt-5-nano",
+    model_provider="openai",
     temperature=0
 )
 
@@ -48,7 +49,7 @@ tools_by_name = {tool.name: tool for tool in tools}
 model_with_tools = model.bind_tools(tools)
 
 
-from langchain.messages import AnyMessage
+from langchain_core.messages import AnyMessage
 from typing_extensions import TypedDict, Annotated
 import operator
 
@@ -58,7 +59,7 @@ class MessagesState(TypedDict):
     llm_calls: int
 
 
-from langchain.messages import SystemMessage
+from langchain_core.messages import SystemMessage
 
 
 def llm_call(state: dict):
@@ -79,7 +80,7 @@ def llm_call(state: dict):
     }
 
 
-from langchain.messages import ToolMessage
+from langchain_core.messages import ToolMessage
 
 
 def tool_node(state: dict):
@@ -137,7 +138,7 @@ with open("agent_graph.png", "wb") as f:
 print("Graph saved as agent_graph.png")
 
 # Invoke
-from langchain.messages import HumanMessage
+from langchain_core.messages import HumanMessage
 messages = [HumanMessage(content="Add 3 and 4.")]
 messages = agent.invoke({"messages": messages})
 for m in messages["messages"]:
